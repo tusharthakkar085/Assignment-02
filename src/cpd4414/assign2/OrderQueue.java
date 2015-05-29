@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Queue;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 /**
  *
@@ -46,7 +48,7 @@ public class OrderQueue {
         return orderQueue.peek();
     }
      
-     void Process(Order next) throws NoTimeReceivedException{
+     void Process(Order next) throws NoTimeReceivedException,NoTimeProcessedException{
         if(next.equals(next())){
             orderList.add(orderQueue.remove());
             next.setTimeProcessed(new Date());
@@ -66,29 +68,49 @@ public class OrderQueue {
             next.setTimeFulfilled(new Date());
         }
     }
-    
-    private static class NoCustomerException extends Exception {
+      
+      String report(){
+        String result = "";
+        if(!(orderQueue.isEmpty() && orderList.isEmpty())){
+            JSONObject jsonobj = new JSONObject();
+            JSONArray jsonarr = new JSONArray();
+            
+            for(Order i : orderList){
+                jsonarr.add(i.toJSON());
+            }
+            
+            for(Order i : orderQueue){
+                jsonarr.add(i.toJSON());
+            }
+            
+            jsonobj.put("orderArray",jsonarr);
+            result = jsonobj.toJSONString();
+        }
+        return result;
+    }
+
+    public static class NoCustomerException extends Exception {
 
         public NoCustomerException() {
              super("There are not any customers.");
         }
     }
 
-    private static class NoPurchasesException extends Exception {
+    public static class NoPurchasesException extends Exception {
 
         public NoPurchasesException() {
             super("There are not any purchases.");
         }
     }
 
-    private static class NoTimeReceivedException extends Exception {
+    public static class NoTimeReceivedException extends Exception {
 
         public NoTimeReceivedException() {
             super("Time is not received on this order.");
         }
     }
 
-    private static class NoTimeProcessedException extends Exception {
+    public static class NoTimeProcessedException extends Exception {
 
         public NoTimeProcessedException() {
             super("Time is not processed on this order.");
