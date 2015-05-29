@@ -54,6 +54,18 @@ public class OrderQueue {
             throw new NoTimeReceivedException();
         }
     }
+     
+      void fulfill(Order next) throws NoTimeReceivedException, NoTimeProcessedException{
+        if(next.getTimeReceived() == null){
+            throw new NoTimeReceivedException();
+        }
+        if(next.getTimeProcessed() == null){
+            throw new NoTimeProcessedException();
+        }
+        if(orderList.contains(next)){
+            next.setTimeFulfilled(new Date());
+        }
+    }
     
     private static class NoCustomerException extends Exception {
 
@@ -73,6 +85,13 @@ public class OrderQueue {
 
         public NoTimeReceivedException() {
             super("Time is not received on this order.");
+        }
+    }
+
+    private static class NoTimeProcessedException extends Exception {
+
+        public NoTimeProcessedException() {
+            super("Time is not processed on this order.");
         }
     }
    
